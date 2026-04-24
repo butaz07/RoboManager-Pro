@@ -1,0 +1,6 @@
+@RoboManager.API_HostAddress = http://localhost:5190
+
+GET {{RoboManager.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
