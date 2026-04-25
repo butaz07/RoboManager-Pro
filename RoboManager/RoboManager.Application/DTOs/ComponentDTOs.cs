@@ -10,6 +10,10 @@ namespace RoboManager.Application.DTOs
         public string NumeroSerie { get; set; } = string.Empty;
         public ComponentType Tipo { get; set; }
         public int ProjectId { get; set; }
+
+        public int Cantidad { get; set; }
+
+        public string Estado { get; set; } = string.Empty;
     }
 
     public class ComponentCreateDto
@@ -19,5 +23,8 @@ namespace RoboManager.Application.DTOs
         public string NumeroSerie { get; set; } = string.Empty;
         public ComponentType Tipo { get; set; }
         public int ProjectId { get; set; }
+            public int Cantidad { get; set; }
+            public string Estado { get; set; } = string.Empty;
     }
+
 }

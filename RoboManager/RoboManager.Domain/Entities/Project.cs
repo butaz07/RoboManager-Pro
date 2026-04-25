@@ -10,7 +10,10 @@ namespace RoboManager.Domain.Entities
         public string Description { get; set; } = string.Empty;
         public ProjectStatus Status { get; set; } = ProjectStatus.Planificacion;
 
-       
+        public DateTime StartDate { get; set; } = DateTime.UtcNow;
+        public DateTime? EndDate { get; set; } 
+
+
         public int? AssignedTeamId { get; set; }
         public virtual Team? AssignedTeam { get; set; }
 

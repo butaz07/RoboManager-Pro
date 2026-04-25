@@ -12,9 +12,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Scalar.AspNetCore" Version="2.14.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RoboManager\RoboManager.Application\RoboManager.Application.csproj" />
     <ProjectReference Include="..\RoboManager\RoboManager.Domain\RoboManager.Domain.csproj" />
     <ProjectReference Include="..\RoboManager\RoboManager.Infraestructure\RoboManager.Infraestructure.csproj" />
   </ItemGroup>

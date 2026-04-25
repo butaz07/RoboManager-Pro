@@ -8,11 +8,14 @@ namespace RoboManager.Application.MappingProfiles
     {
         public TeamProfile()
         {
-           
-            CreateMap<Team, TeamDto>();
-
             
-            CreateMap<TeamCreateDto, Team>();
+            CreateMap<Team, TeamDto>()
+                .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.Description));
+
+            CreateMap<TeamCreateDto, Team>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Nombre))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Descripcion));
         }
     }
 }
