@@ -1,12 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using RoboManager.Application.DTOs;
 
 namespace RoboManager.Application.Contracts
 {
     internal interface ITeamService
+    public interface ITeamService
     {
+        
+        Task<IEnumerable<TeamDto>> GetAllTeamsAsync();
+
+        
+        Task<TeamDto?> GetTeamByIdAsync(int id);
+
+        
+        Task<TeamDto> CreateTeamAsync(TeamCreateDto teamDto);
+
+        
+        Task<bool> UpdateTeamAsync(int id, TeamCreateDto teamDto);
+
+        
+        Task<bool> DeleteTeamAsync(int id);
     }
 }

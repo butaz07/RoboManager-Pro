@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using RoboManager.Application.Contracts;
 using RoboManager.Application.Services;
 using RoboManager.Infraestructura.Data;
-using RoboManager.Infraestructura.Repositories;
+using RoboManager.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +13,9 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<RoboManagerApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(RoboManager.Infrastructure.Repositories.GenericRepository<>));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Registrar AutoMapper escaneando todos los perfiles en el dominio actual
 // Registrar AutoMapper manualmente con el perfil específico
