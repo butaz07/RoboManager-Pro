@@ -1,0 +1,60 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Editar Equipo";
+
+    // 🔥 FUNCIÓN SALVAVIDAS: Previene el error al cargar los datos en los inputs
+    string ObtenerValorSeguro(dynamic item, string opcion1, string opcion2)
+    {
+        var json = (System.Text.Json.JsonElement)item;
+
+        if (json.TryGetProperty(opcion1, out var val)) return val.ToString();
+        if (json.TryGetProperty(opcion1.ToLower(), out val)) return val.ToString();
+        if (json.TryGetProperty(char.ToUpper(opcion1[0]) + opcion1.Substring(1), out val)) return val.ToString();
+
+        if (json.TryGetProperty(opcion2, out val)) return val.ToString();
+        if (json.TryGetProperty(opcion2.ToLower(), out val)) return val.ToString();
+        if (json.TryGetProperty(char.ToUpper(opcion2[0]) + opcion2.Substring(1), out val)) return val.ToString();
+
+        return ""; // Devuelve vacío para que no dañe el input si no lo encuentra
+    }
+
+    int ObtenerIdSeguro(dynamic item)
+    {
+        var json = (System.Text.Json.JsonElement)item;
+        if (json.TryGetProperty("id", out var val)) return val.GetInt32();
+        if (json.TryGetProperty("Id", out val)) return val.GetInt32();
+        return 0;
+    }
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark py-3">
+                    <h5 class="mb-0"><i class="fas fa-user-edit me-2"></i>Editar Equipo</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="/Team/Edit" method="post">
+                        <input type="hidden" name="id" value='@ObtenerIdSeguro(Model)' />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombre del Equipo</label>
+                            <input type="text" name="nombre" class="form-control" value='@ObtenerValorSeguro(Model, "nombre", "name")' required />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Especialidad</label>
+                            <input type="text" name="especialidad" class="form-control" value='@ObtenerValorSeguro(Model, "descripcion", "description")' required />
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/Team" class="btn btn-light border">Volver</a>
+                            <button type="submit" class="btn btn-warning fw-bold px-4">Actualizar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

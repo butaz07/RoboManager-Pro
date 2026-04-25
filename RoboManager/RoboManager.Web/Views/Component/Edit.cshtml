@@ -1,0 +1,66 @@
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Editar Pieza";
+
+    // Leemos como texto desde el principio
+    string tipoStr = Model.GetProperty("tipo").ToString();
+    string estadoStr = Model.GetProperty("estado").ToString();
+}
+
+<div class="container mt-5">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0 mt-1"><i class="fas fa-edit me-2"></i>Editar Pieza de Inventario</h5>
+                </div>
+                <div class="card-body bg-white">
+                    <form action="/Project/Edit" method="post" novalidate>
+                        <input type="hidden" name="id" value='@Model.GetProperty("id").GetInt32()' />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Nombre del Componente</label>
+                            <input type="text" name="nombre" class="form-control" value='@Model.GetProperty("nombre").GetString()' required />
+                        </div>
+
+                        <div>
+                            class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Tipo de Material</label>
+                                <select name="tipo" class="form-select">
+                                    <option value="0" selected="@(tipoStr == "0" || tipoStr == "Electronico")">Electrónico</option>
+                                    <option value="1" selected="@(tipoStr == "1" || tipoStr == "Mecanico")">Mecánico</option>
+                                    <option value="2" selected="@(tipoStr == "2" || tipoStr == "Estructural")">Estructural</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Cantidad Disponible</label>
+                                <input type="number" name="cantidad" class="form-control" value='@Model.GetProperty("cantidad").GetInt32()' min="0" required />
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Estado Actual</label>
+                                <select name="estado" class="form-select">
+                                    <option value="0" selected="@(estadoStr == "0" || estadoStr == "Disponible")">Disponible</option>
+                                    <option value="1" selected="@(estadoStr == "1" || estadoStr == "EnUso" || estadoStr == "En Uso")">En Uso</option>
+                                    <option value="2" selected="@(estadoStr == "2" || estadoStr == "Dañado" || estadoStr == "Danado")">Dañado / Mantenimiento</option>
+                                </select>
+                            </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/Component" class="btn btn-light border">Cancelar</a>
+                            <button type="submit" class="btn btn-warning fw-bold px-4">Actualizar Pieza</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

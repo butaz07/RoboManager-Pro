@@ -27,5 +27,21 @@ namespace RoboManager.API.Controllers
             var result = await _memberService.CreateMemberAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(int id, [FromBody] MemberCreateDto dto)
+        {
+            var updated = await _memberService.UpdateMemberAsync(id, dto);
+            if (!updated) return NotFound();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var deleted = await _memberService.DeleteMemberAsync(id);
+            if (!deleted) return NotFound();
+            return NoContent();
+        }
     }
 }

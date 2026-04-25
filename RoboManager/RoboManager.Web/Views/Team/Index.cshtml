@@ -1,0 +1,103 @@
+﻿@model List<dynamic>
+
+@{
+    ViewData["Title"] = "Gestión de Equipos";
+
+    // 🔥 FUNCIÓN SALVAVIDAS: Previene el KeyNotFoundException buscando todas las variaciones
+    string ObtenerValorSeguro(dynamic item, string opcion1, string opcion2)
+    {
+        var json = (System.Text.Json.JsonElement)item;
+
+        // Intenta la opción 1 (ej: "nombre", "Nombre")
+        if (json.TryGetProperty(opcion1, out var val)) return val.ToString();
+        if (json.TryGetProperty(opcion1.ToLower(), out val)) return val.ToString();
+        if (json.TryGetProperty(char.ToUpper(opcion1[0]) + opcion1.Substring(1), out val)) return val.ToString();
+
+        // Intenta la opción 2 por si está en inglés (ej: "name", "Name")
+        if (json.TryGetProperty(opcion2, out val)) return val.ToString();
+        if (json.TryGetProperty(opcion2.ToLower(), out val)) return val.ToString();
+        if (json.TryGetProperty(char.ToUpper(opcion2[0]) + opcion2.Substring(1), out val)) return val.ToString();
+
+        return "N/A"; // Si de verdad no existe, muestra N/A pero no crashea
+    }
+
+    // 🔥 Extrae el ID seguro
+    int ObtenerIdSeguro(dynamic item)
+    {
+        var json = (System.Text.Json.JsonElement)item;
+        if (json.TryGetProperty("id", out var val)) return val.GetInt32();
+        if (json.TryGetProperty("Id", out val)) return val.GetInt32();
+        return 0;
+    }
+}
+
+<div class="container mt-5">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> <strong>¡Ups!</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary" style="color: #0d6efd !important;">Equipos de Trabajo</h2>
+        <p class="text-muted">Organiza a los miembros en escuadrones especializados por tecnología.</p>
+    </div>
+
+    <div class="d-flex justify-content-end mb-3">
+        <a href="/Team/Create" class="btn btn-primary">
+            <i class="fas fa-users-cog me-1"></i> Registrar Nuevo Equipo
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle mb-0 bg-white">
+            <thead class="bg-light" style="border-bottom: 3px solid #dee2e6;">
+                <tr class="text-muted">
+                    <th class="py-3">Nombre del Equipo</th>
+                    <th class="py-3">Especialidad</th>
+                    <th class="py-3 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    @foreach (var team in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@ObtenerValorSeguro(team, "nombre", "name")</td>
+                            <td>
+                                <span class="badge bg-info text-dark px-3 py-2 rounded-pill">
+                                    <i class="fas fa-tag me-1"></i>@ObtenerValorSeguro(team, "descripcion", "description")
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="/Team/Edit/@ObtenerIdSeguro(team)" class="btn btn-warning btn-sm text-white">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="/Team/Delete" method="post" onsubmit="return confirm('¿Eliminar este equipo?');">
+                                        <input type="hidden" name="id" value='@ObtenerIdSeguro(team)' />
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center py-5 text-muted">
+                            <i class="fas fa-users-slash fa-3x mb-3 text-light"></i>
+                            <p>No hay equipos registrados todavía.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

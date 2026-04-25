@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Crear Equipo";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Nuevo Equipo</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="/Team/Create" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombre del Equipo</label>
+                            <input type="text" name="nombre" class="form-control" placeholder="Ej: Escuadrón Mecatrónica" required />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Especialidad</label>
+                            <input type="text" name="especialidad" class="form-control" placeholder="Ej: Programación, Diseño 3D..." required />
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="/Team" class="btn btn-light border">Cancelar</a>
+                            <button type="submit" class="btn btn-primary px-4">Guardar Equipo</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

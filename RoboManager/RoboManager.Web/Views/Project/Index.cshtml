@@ -1,0 +1,82 @@
+﻿@model List<dynamic>
+
+@{
+    ViewData["Title"] = "Gestión de Proyectos";
+}
+
+<div class="container mt-5">
+
+    @if (ViewBag.Error != null || TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> <strong>¡Ups!</strong> @(ViewBag.Error ?? TempData["Error"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary" style="color: #0d6efd !important;">Proyectos y Competencias</h2>
+        <p class="text-muted">Administra los retos robóticos, fechas límite y objetivos del equipo.</p>
+    </div>
+
+    <div class="d-flex justify-content-end mb-3 gap-2">
+        <a href="/Project/Create" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> Crear Nuevo Proyecto
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle mb-0 bg-white">
+            <thead class="bg-light" style="border-bottom: 3px solid #dee2e6;">
+                <tr class="text-muted">
+                    <th class="py-3">Nombre del Proyecto</th>
+                    <th class="py-3">Descripción</th>
+                    <th class="py-3">Fecha Inicio</th>
+                    <th class="py-3">Fecha Fin</th>
+                    <th class="py-3 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    @foreach (var proy in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold text-itla-blue">@proy.GetProperty("nombre").GetString()</td>
+
+                            <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title='@proy.GetProperty("descripcion").GetString()'>
+                                @proy.GetProperty("descripcion").GetString()
+                            </td>
+
+                            <td><i class="far fa-calendar-alt text-secondary me-1"></i> @Convert.ToDateTime(proy.GetProperty("fechaInicio").GetString()).ToString("dd/MM/yyyy")</td>
+                            <td><i class="far fa-calendar-check text-secondary me-1"></i> @Convert.ToDateTime(proy.GetProperty("fechaFin").GetString()).ToString("dd/MM/yyyy")</td>
+
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="/Project/Edit/@proy.GetProperty("id").GetInt32()" class="btn btn-warning btn-sm text-white" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="/Project/Delete" method="post" onsubmit="return confirm('¿Seguro que deseas eliminar este proyecto?');">
+                                        <input type="hidden" name="id" value='@proy.GetProperty("id").GetInt32()' />
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            <i class="fas fa-project-diagram fa-3x mb-3 text-light"></i>
+                            <p>No hay proyectos activos en este momento.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

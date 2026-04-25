@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq; // Indispensable para filtrar con .Where
 using System.Threading.Tasks;
 using AutoMapper;
 using RoboManager.Application.Contracts;
@@ -18,15 +19,27 @@ namespace RoboManager.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ComponentDto>> GetAllComponentsAsync() =>
-            _mapper.Map<IEnumerable<ComponentDto>>(await _unitOfWork.ComponentRepository.GetAllAsync());
+        // 🔥 FILTRO: Solo devolvemos componentes con Activo = true
+        public async Task<IEnumerable<ComponentDto>> GetAllComponentsAsync()
+        {
+            var entities = await _unitOfWork.ComponentRepository.GetAllAsync();
+            var activos = entities.Where(c => c.Activo).ToList();
+            return _mapper.Map<IEnumerable<ComponentDto>>(activos);
+        }
 
-        public async Task<ComponentDto?> GetComponentByIdAsync(int id) =>
-            _mapper.Map<ComponentDto>(await _unitOfWork.ComponentRepository.GetByIdAsync(id));
+        // 🔥 SEGURIDAD: Validamos que el ID solicitado no esté borrado lógicamente
+        public async Task<ComponentDto?> GetComponentByIdAsync(int id)
+        {
+            var entity = await _unitOfWork.ComponentRepository.GetByIdAsync(id);
+            if (entity == null || !entity.Activo) return null;
+
+            return _mapper.Map<ComponentDto>(entity);
+        }
 
         public async Task<ComponentDto> CreateComponentAsync(ComponentCreateDto dto)
         {
             var entity = _mapper.Map<Component>(dto);
+            entity.Activo = true; // Forzamos que se cree como activo
             await _unitOfWork.ComponentRepository.AddAsync(entity);
             await _unitOfWork.CompleteAsync();
             return _mapper.Map<ComponentDto>(entity);
@@ -35,7 +48,8 @@ namespace RoboManager.Application.Services
         public async Task<bool> UpdateComponentAsync(int id, ComponentCreateDto dto)
         {
             var entity = await _unitOfWork.ComponentRepository.GetByIdAsync(id);
-            if (entity == null) return false;
+            // 🔥 SEGURIDAD: No permitimos actualizar si ya fue "borrado"
+            if (entity == null || !entity.Activo) return false;
 
             _mapper.Map(dto, entity);
             await _unitOfWork.ComponentRepository.UpdateAsync(entity);
@@ -48,6 +62,7 @@ namespace RoboManager.Application.Services
             var entity = await _unitOfWork.ComponentRepository.GetByIdAsync(id);
             if (entity == null) return false;
 
+            // Borrado lógico: Cambiamos el switch a false
             entity.Activo = false;
             await _unitOfWork.ComponentRepository.UpdateAsync(entity);
             await _unitOfWork.CompleteAsync();

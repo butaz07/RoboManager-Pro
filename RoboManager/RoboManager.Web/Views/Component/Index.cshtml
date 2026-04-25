@@ -1,0 +1,103 @@
+﻿@model List<dynamic>
+
+@{
+    ViewData["Title"] = "Inventario de Componentes";
+}
+
+<div class="container mt-5">
+
+    @if (ViewBag.Error != null || TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> <strong>¡Ups!</strong> @(ViewBag.Error ?? TempData["Error"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary" style="color: #0d6efd !important;">Inventario de Robótica</h2>
+        <p class="text-muted">Gestiona el stock de sensores, motores y microcontroladores disponibles.</p>
+    </div>
+
+    <div class="d-flex justify-content-end mb-3 gap-2">
+        <a href="/Component/Create" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> Registrar Nueva Pieza
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle mb-0 bg-white">
+            <thead class="bg-light" style="border-bottom: 3px solid #dee2e6;">
+                <tr class="text-muted">
+                    <th class="py-3">Nombre del Componente</th>
+                    <th class="py-3">Tipo</th>
+                    <th class="py-3">Cantidad</th>
+                    <th class="py-3">Estado</th>
+                    <th class="py-3 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    @foreach (var comp in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@comp.GetProperty("nombre").GetString()</td>
+
+                            <td>
+                                @if (comp.GetProperty("tipo").ToString() == "0" || comp.GetProperty("tipo").ToString() == "Electronico")
+                                {
+                                    <span><i class="fas fa-microchip text-secondary"></i> Electrónico</span>
+                                }
+                                else
+                                {
+                                    <span><i class="fas fa-cogs text-secondary"></i> Mecánico</span>
+                                }
+                            </td>
+
+                            <td><span class="badge bg-secondary rounded-pill fs-6">@comp.GetProperty("cantidad").GetInt32() uds</span></td>
+
+                            <td>
+                                @if (comp.GetProperty("estado").ToString() == "0" || comp.GetProperty("estado").ToString() == "Disponible")
+                                {
+                                    <span class="badge bg-success px-3 py-2 rounded-pill">Disponible</span>
+                                }
+                                else if (comp.GetProperty("estado").ToString() == "1" || comp.GetProperty("estado").ToString() == "EnUso" || comp.GetProperty("estado").ToString() == "En Uso")
+                                {
+                                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">En Uso</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger px-3 py-2 rounded-pill">Dañado</span>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="/Component/Edit/@comp.GetProperty("id").GetInt32()" class="btn btn-warning btn-sm text-white" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="/Component/Delete" method="post" onsubmit="return confirm('¿Seguro que deseas eliminar esta pieza del inventario?');">
+                                        <input type="hidden" name="id" value='@comp.GetProperty("id").GetInt32()' />
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">
+                            <i class="fas fa-box-open fa-3x mb-3 text-light"></i>
+                            <p>El inventario está vacío en este momento.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
