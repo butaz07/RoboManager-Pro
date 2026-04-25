@@ -11,6 +11,6 @@ namespace RoboManager.Domain.Common
         public int Id { get; set; }
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
         public DateTime? FechaModificacion { get; set; }
-        public bool Activo { get; set; } = true; // Útil para Soft Deletes (borrado lógico)
+        public bool Activo { get; set; } = true; 
     }
 }

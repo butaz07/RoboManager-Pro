@@ -8,9 +8,9 @@ namespace RoboManager.Domain.Entities
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public ProjectStatus Status { get; set; } = ProjectStatus.Planning;
+        public ProjectStatus Status { get; set; } = ProjectStatus.Planificacion;
 
-        // Relationships
+       
         public int? AssignedTeamId { get; set; }
         public virtual Team? AssignedTeam { get; set; }
 

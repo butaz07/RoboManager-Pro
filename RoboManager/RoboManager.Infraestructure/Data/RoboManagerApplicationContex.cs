@@ -9,17 +9,17 @@ namespace RoboManager.Infraestructura.Data
 {
     public class RoboManagerApplicationDbContext : DbContext
     {
-       
-        public RoboManagerApplicationDbContext(DbContextOptions<RoboManagerApplicationDbContext> options) : base(options)
+        public RoboManagerApplicationDbContext(DbContextOptions<RoboManagerApplicationDbContext> options) 
+            : base(options)
         {
         }
 
-       
+        
         public DbSet<Team> Teams { get; set; }
         public DbSet<Member> Members { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Component> Components { get; set; }
-        public DbSet<ProjectTask> Tasks { get; set; }
+        public DbSet<ProjectTask> Tasks { get; set; } 
         public DbSet<Meeting> Meetings { get; set; }
 
         
@@ -33,20 +33,16 @@ namespace RoboManager.Infraestructura.Data
                         entry.Entity.FechaCreacion = DateTime.UtcNow;
                         entry.Entity.Activo = true;
                         break;
-                    case EntityState.Modified:
-                        entry.Entity.FechaModificacion = DateTime.UtcNow;
-                        break;
                 }
             }
             return base.SaveChangesAsync(cancellationToken);
         }
 
-       
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-           
+            
+            
         }
     }
 }

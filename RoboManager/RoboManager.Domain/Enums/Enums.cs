@@ -1,33 +1,46 @@
 ﻿namespace RoboManager.Domain.Enums
 {
+   
+
     public enum MemberRole
     {
-        Leader, Programmer, Assembler, CAD_Designer, Documenter
-    }
-
-    public enum ProjectStatus
-    {
-        Planning, InDevelopment, Testing, Completed, Paused
-    }
-
-    public enum ComponentStatus
-    {
-        Available, InUse, OutOfStock, Damaged, Lost
+        Estudiante, LiderDeProyecto, Profesor, Administrador
     }
 
     public enum MaterialType
     {
-        Hardware, Consumable, Tool
+        Electronico, Mecanico, Estructural, Consumible, Herramienta, Otro
     }
 
-    // RENOMBRADO para evitar conflicto con System.Threading.Tasks
+    public enum ComponentStatus
+    {
+        Disponible, EnUso, Danado, EnReparacion, Extraviado
+    }
+
+    public enum ProjectStatus
+    {
+        Planificacion, EnDesarrollo, Completado, Pausado, Cancelado
+    }
+
+   
+
+    public enum RoleType
+    {
+        Estudiante, LiderDeProyecto, Profesor, Administrador
+    }
+
+    public enum ComponentType
+    {
+        Microcontrolador, Sensor, Motor, Herramienta, Otro
+    }
+
     public enum ProjectTaskStatus
     {
-        Pending, InProgress, Blocked, Completed
+        Pendiente, EnProgreso, Completada, Cancelada
     }
 
     public enum MeetingStatus
     {
-        Scheduled, Completed, Canceled, Rescheduled
+        Programada, EnCurso, Finalizada, Cancelada
     }
 }

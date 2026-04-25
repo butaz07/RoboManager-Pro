@@ -4,9 +4,10 @@ using RoboManager.Application.DTOs;
 
 namespace RoboManager.Application.Contracts
 {
-    internal interface ITeamService
     public interface ITeamService
     {
+        public interface ITeamService{
+    
         
         Task<IEnumerable<TeamDto>> GetAllTeamsAsync();
 
@@ -22,4 +23,5 @@ namespace RoboManager.Application.Contracts
         
         Task<bool> DeleteTeamAsync(int id);
     }
+}
 }

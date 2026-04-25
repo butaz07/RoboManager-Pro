@@ -8,10 +8,10 @@ namespace RoboManager.Application.MappingProfiles
     {
         public TeamProfile()
         {
-            // De Entidad a DTO (Para cuando leemos de la base de datos)
+           
             CreateMap<Team, TeamDto>();
 
-            // De DTO a Entidad (Para cuando creamos o actualizamos desde el Frontend)
+            
             CreateMap<TeamCreateDto, Team>();
         }
     }

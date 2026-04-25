@@ -8,7 +8,7 @@ namespace RoboManager.Domain.Entities
     {
         public string Purpose { get; set; } = string.Empty;
         public DateTime ScheduledAt { get; set; }
-        public MeetingStatus Status { get; set; } = MeetingStatus.Scheduled;
+        public MeetingStatus Status { get; set; } = MeetingStatus.Programada;
         public string Notes { get; set; } = string.Empty;
 
         public int ProjectId { get; set; }

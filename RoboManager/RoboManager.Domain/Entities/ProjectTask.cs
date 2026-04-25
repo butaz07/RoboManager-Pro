@@ -1,6 +1,6 @@
 ﻿using System;
 using RoboManager.Domain.Common;
-using RoboManager.Domain.Enums; // Asegúrate de que esto esté aquí
+using RoboManager.Domain.Enums; 
 
 namespace RoboManager.Domain.Entities
 {
@@ -9,8 +9,8 @@ namespace RoboManager.Domain.Entities
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
 
-        // Usando el nuevo nombre del Enum
-        public ProjectTaskStatus Status { get; set; } = ProjectTaskStatus.Pending;
+        
+        public ProjectTaskStatus Status { get; set; } = ProjectTaskStatus.Pendiente;
 
         public DateTime Deadline { get; set; }
 

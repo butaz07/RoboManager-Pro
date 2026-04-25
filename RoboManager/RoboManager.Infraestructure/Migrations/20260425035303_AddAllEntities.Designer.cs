@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RoboManager.Infraestructura.Data;
 
@@ -11,9 +12,11 @@ using RoboManager.Infraestructura.Data;
 namespace RoboManager.Infraestructure.Migrations
 {
     [DbContext(typeof(RoboManagerApplicationDbContext))]
-    partial class RoboManagerApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260425035303_AddAllEntities")]
+    partial class AddAllEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
