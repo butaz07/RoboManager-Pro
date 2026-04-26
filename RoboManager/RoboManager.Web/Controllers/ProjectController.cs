@@ -14,7 +14,7 @@ namespace RoboManager.Web.Controllers
             _httpClient.BaseAddress = new Uri("https://localhost:7169/");
         }
 
-        // 🔥 MÉTODO TRAMPA: Obliga a mostrar el error en pantalla sin parpadear
+        
         private async Task<IActionResult> VolverALaTablaConError(string mensajeError)
         {
             ViewBag.Error = mensajeError;
@@ -69,7 +69,7 @@ namespace RoboManager.Web.Controllers
                 return View(project);
             }
 
-            // AQUÍ OCURRÍA EL PARPADEO. Ahora te mostrará exactamente qué falta en la API.
+            
             return await VolverALaTablaConError($"La API rechazó buscar el proyecto. Respondió código: {response.StatusCode}. ¿Te falta el método GET por ID en tu API?");
         }
 
@@ -97,7 +97,7 @@ namespace RoboManager.Web.Controllers
                 return await VolverALaTablaConError($"La API rechazó eliminar el ID {id}. Status: {response.StatusCode}");
             }
 
-            // 🔥 TRAMPA: Forzamos el mensaje de "éxito" para confirmar la teoría 🔥
+            
             TempData["Error"] = $"La API dijo que SÍ eliminó el ID {id} con éxito. Si el proyecto sigue en la tabla, el problema está en tu IProjectService (probablemente te falta el SaveChangesAsync).";
 
             return RedirectToAction("Index");

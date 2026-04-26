@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Editar Equipo";
 
-    // 🔥 FUNCIÓN SALVAVIDAS: Previene el error al cargar los datos en los inputs
+    
     string ObtenerValorSeguro(dynamic item, string opcion1, string opcion2)
     {
         var json = (System.Text.Json.JsonElement)item;
@@ -15,7 +15,7 @@
         if (json.TryGetProperty(opcion2.ToLower(), out val)) return val.ToString();
         if (json.TryGetProperty(char.ToUpper(opcion2[0]) + opcion2.Substring(1), out val)) return val.ToString();
 
-        return ""; // Devuelve vacío para que no dañe el input si no lo encuentra
+        return ""; 
     }
 
     int ObtenerIdSeguro(dynamic item)

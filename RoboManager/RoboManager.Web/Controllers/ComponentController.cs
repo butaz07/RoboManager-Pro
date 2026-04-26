@@ -11,11 +11,11 @@ namespace RoboManager.Web.Controllers
         public ComponentController()
         {
             _httpClient = new HttpClient();
-            // Asegúrate de que este sea tu puerto de Swagger
+            
             _httpClient.BaseAddress = new Uri("https://localhost:7169/");
         }
 
-        // 1. Mostrar la tabla del Inventario
+        
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -29,26 +29,26 @@ namespace RoboManager.Web.Controllers
             return View(new List<dynamic>());
         }
 
-        // ==========================================
-        // 2. MUESTRA LA PANTALLA DE CREAR (¡Faltaba esto!)
-        // ==========================================
+        
+        
+        
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // 3. RECIBE LOS DATOS DEL FORMULARIO Y GUARDA
+        
         [HttpPost]
         public async Task<IActionResult> Create(string nombre, int tipo, int cantidad, int estado)
         {
-            // Usamos la primera letra mayúscula para coincidir con tu DTO en la API
+            
             var nuevoComponente = new
             {
                 Nombre = nombre,
                 Tipo = tipo,
                 Cantidad = cantidad,
-                Estado = estado.ToString() // Enviamos como texto para evitar el error de JSON
+                Estado = estado.ToString() 
             };
 
             var json = JsonSerializer.Serialize(nuevoComponente);
@@ -58,18 +58,18 @@ namespace RoboManager.Web.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToAction("Index"); // Todo perfecto, volvemos a la tabla
+                return RedirectToAction("Index"); 
             }
 
-            // Si falla, mostramos el error en la alerta roja
+            
             var errorDeLaApi = await response.Content.ReadAsStringAsync();
             TempData["Error"] = $"La API rechazó el guardado. Detalles: {errorDeLaApi}";
             return RedirectToAction("Create");
         }
 
-        // ==========================================
-        // 4. MUESTRA LA PANTALLA DE EDITAR (¡Faltaba esto!)
-        // ==========================================
+       
+        
+        
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -78,12 +78,12 @@ namespace RoboManager.Web.Controllers
             {
                 var jsonString = await response.Content.ReadAsStringAsync();
                 var component = JsonSerializer.Deserialize<dynamic>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                return View(component); // Abre Edit.cshtml con los datos pre-llenados
+                return View(component); 
             }
             return RedirectToAction("Index");
         }
 
-        // 5. RECIBE LOS DATOS ACTUALIZADOS Y LOS MANDA A LA API
+        
         [HttpPost]
         public async Task<IActionResult> Edit(int id, string nombre, int tipo, int cantidad, int estado)
         {
@@ -108,7 +108,7 @@ namespace RoboManager.Web.Controllers
             return RedirectToAction("Index");
         }
 
-        // 6. ELIMINAR COMPONENTE
+        
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {

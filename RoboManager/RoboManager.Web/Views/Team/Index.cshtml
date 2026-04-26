@@ -3,25 +3,25 @@
 @{
     ViewData["Title"] = "Gestión de Equipos";
 
-    // 🔥 FUNCIÓN SALVAVIDAS: Previene el KeyNotFoundException buscando todas las variaciones
+    
     string ObtenerValorSeguro(dynamic item, string opcion1, string opcion2)
     {
         var json = (System.Text.Json.JsonElement)item;
 
-        // Intenta la opción 1 (ej: "nombre", "Nombre")
+        
         if (json.TryGetProperty(opcion1, out var val)) return val.ToString();
         if (json.TryGetProperty(opcion1.ToLower(), out val)) return val.ToString();
         if (json.TryGetProperty(char.ToUpper(opcion1[0]) + opcion1.Substring(1), out val)) return val.ToString();
 
-        // Intenta la opción 2 por si está en inglés (ej: "name", "Name")
+        
         if (json.TryGetProperty(opcion2, out val)) return val.ToString();
         if (json.TryGetProperty(opcion2.ToLower(), out val)) return val.ToString();
         if (json.TryGetProperty(char.ToUpper(opcion2[0]) + opcion2.Substring(1), out val)) return val.ToString();
 
-        return "N/A"; // Si de verdad no existe, muestra N/A pero no crashea
+        return "N/A"; 
     }
 
-    // 🔥 Extrae el ID seguro
+    
     int ObtenerIdSeguro(dynamic item)
     {
         var json = (System.Text.Json.JsonElement)item;
@@ -71,6 +71,24 @@
                                 <span class="badge bg-info text-dark px-3 py-2 rounded-pill">
                                     <i class="fas fa-tag me-1"></i>@ObtenerValorSeguro(team, "descripcion", "description")
                                 </span>
+
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="/Team/Details/@ObtenerIdSeguro(team)" class="btn btn-info btn-sm text-white" title="Ver Integrantes">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+
+                                    <a href="/Team/Edit/@ObtenerIdSeguro(team)" class="btn btn-warning btn-sm text-white">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="/Team/Delete" method="post" onsubmit="return confirm('¿Eliminar este equipo?');">
+                                        <input type="hidden" name="id" value='@ObtenerIdSeguro(team)' />
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                             </td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-2">

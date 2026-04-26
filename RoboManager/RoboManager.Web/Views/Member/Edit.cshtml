@@ -2,6 +2,31 @@
 
 @{
     ViewData["Title"] = "Editar Miembro";
+
+    
+    string ObtenerValorSeguro(dynamic item, string opcion)
+    {
+        if (item is System.Text.Json.JsonElement json)
+        {
+            if (json.TryGetProperty(opcion, out var val)) return val.ToString();
+            if (json.TryGetProperty(char.ToUpper(opcion[0]) + opcion.Substring(1), out val)) return val.ToString();
+        }
+        return "";
+    }
+
+    int ObtenerIntSeguro(dynamic item, string opcion)
+    {
+        if (item is System.Text.Json.JsonElement json)
+        {
+            if (json.TryGetProperty(opcion, out var val) && val.ValueKind != System.Text.Json.JsonValueKind.Null) return val.GetInt32();
+            if (json.TryGetProperty(char.ToUpper(opcion[0]) + opcion.Substring(1), out val) && val.ValueKind != System.Text.Json.JsonValueKind.Null) return val.GetInt32();
+        }
+        return 0;
+    }
+
+    
+    int currentTeamId = ObtenerIntSeguro(Model, "teamId");
+    int currentRol = ObtenerIntSeguro(Model, "rol");
 }
 
 <div class="container mt-5">
@@ -13,24 +38,25 @@
                 </div>
                 <div class="card-body bg-white">
                     <form action="/Member/Edit" method="post">
-                        <input type="hidden" name="id" value='@Model.GetProperty("id").GetInt32()' />
+
+                        <input type="hidden" name="id" value='@ObtenerIntSeguro(Model, "id")' />
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Nombre</label>
-                            <input type="text" name="nombre" class="form-control" value='@Model.GetProperty("nombre").GetString()' required />
+                            <input type="text" name="nombre" class="form-control" value='@ObtenerValorSeguro(Model, "nombre")' required />
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Apellido</label>
-                            <input type="text" name="apellido" class="form-control" value='@Model.GetProperty("apellido").GetString()' required />
+                            <input type="text" name="apellido" class="form-control" value='@ObtenerValorSeguro(Model, "apellido")' required />
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Correo Electrónico</label>
-                            <input type="email" name="correo" class="form-control" value='@Model.GetProperty("correo").GetString()' required />
+                            <input type="email" name="correo" class="form-control" value='@ObtenerValorSeguro(Model, "correo")' required />
                         </div>
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-label fw-semibold">Rol en el equipo</label>
                             <select name="rol" class="form-select">
-                                @if (Model.GetProperty("rol").GetInt32() == 0)
+                                @if (currentRol == 0)
                                 {
                                     <option value="0" selected>Estudiante</option>
                                     <option value="1">Líder</option>
@@ -42,6 +68,39 @@
                                 }
                             </select>
                         </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Asignar a un Equipo</label>
+                            <select name="teamId" class="form-select">
+                                <option value="">-- Sin equipo asignado --</option>
+                                @if (ViewBag.Equipos != null)
+                                {
+                                    foreach (var equipo in ViewBag.Equipos)
+                                    {
+                                        if (equipo is System.Text.Json.JsonElement eqJson)
+                                        {
+                                            int idEq = 0;
+                                            if (eqJson.TryGetProperty("id", out var idProp)) idEq = idProp.GetInt32();
+                                            else if (eqJson.TryGetProperty("Id", out idProp)) idEq = idProp.GetInt32();
+
+                                            string nombreEq = "Desconocido";
+                                            if (eqJson.TryGetProperty("nombre", out var nomProp)) nombreEq = nomProp.GetString();
+                                            else if (eqJson.TryGetProperty("Nombre", out nomProp)) nombreEq = nomProp.GetString();
+
+                                            if (idEq == currentTeamId && idEq != 0)
+                                            {
+                                                <option value="@idEq" selected>@nombreEq</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@idEq">@nombreEq</option>
+                                            }
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+
                         <div class="d-flex justify-content-between">
                             <a href="/Member" class="btn btn-light border">Cancelar</a>
                             <button type="submit" class="btn btn-warning px-4 fw-bold">Actualizar</button>

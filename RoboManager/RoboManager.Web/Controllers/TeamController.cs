@@ -33,7 +33,7 @@ namespace RoboManager.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(string nombre, string especialidad)
         {
-            // 🔥 AQUÍ ESTÁ LA MAGIA: Empaquetamos "especialidad" dentro de "Descripcion"
+            
             var nuevo = new { Nombre = nombre, Descripcion = especialidad };
             var json = JsonSerializer.Serialize(nuevo);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -61,7 +61,7 @@ namespace RoboManager.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(int id, string nombre, string especialidad)
         {
-            // 🔥 Y AQUÍ TAMBIÉN: Empaquetamos "especialidad" dentro de "Descripcion"
+            
             var editado = new { Nombre = nombre, Descripcion = especialidad };
             var json = JsonSerializer.Serialize(editado);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -82,6 +82,47 @@ namespace RoboManager.Web.Controllers
                 TempData["Error"] = "No se pudo eliminar el equipo.";
             }
             return RedirectToAction("Index");
+        }
+
+        
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+           
+            var responseTeam = await _httpClient.GetAsync($"api/Team/{id}");
+            if (!responseTeam.IsSuccessStatusCode) return RedirectToAction("Index");
+
+            var teamJson = await responseTeam.Content.ReadAsStringAsync();
+            var team = JsonSerializer.Deserialize<dynamic>(teamJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+           
+            var responseMembers = await _httpClient.GetAsync("api/Member");
+            var miembrosDelEquipo = new List<dynamic>();
+
+            if (responseMembers.IsSuccessStatusCode)
+            {
+                var membersJson = await responseMembers.Content.ReadAsStringAsync();
+                var allMembers = JsonSerializer.Deserialize<List<dynamic>>(membersJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                foreach (var member in allMembers)
+                {
+                    if (member is System.Text.Json.JsonElement mJson)
+                    {
+                        
+                        if ((mJson.TryGetProperty("teamId", out var tId) || mJson.TryGetProperty("TeamId", out tId)) && tId.ValueKind != System.Text.Json.JsonValueKind.Null)
+                        {
+                            if (tId.GetInt32() == id)
+                            {
+                                miembrosDelEquipo.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
+            
+            ViewBag.Miembros = miembrosDelEquipo;
+            return View(team);
         }
     }
 }

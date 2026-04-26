@@ -1,0 +1,110 @@
+﻿@model List<dynamic>
+
+@{
+    ViewData["Title"] = "Cronograma de Reuniones";
+
+    
+    string ObtenerStr(dynamic item, string campo)
+    {
+        if (item is System.Text.Json.JsonElement j)
+        {
+            if (j.TryGetProperty(campo, out var v)) return v.ToString();
+            if (j.TryGetProperty(char.ToUpper(campo[0]) + campo.Substring(1), out v)) return v.ToString();
+        }
+        return "N/A";
+    }
+
+    int ObtenerId(dynamic item)
+    {
+        if (item is System.Text.Json.JsonElement j)
+        {
+            if (j.TryGetProperty("id", out var v)) return v.GetInt32();
+            if (j.TryGetProperty("Id", out v)) return v.GetInt32();
+        }
+        return 0;
+    }
+
+    DateTime ObtenerFecha(dynamic item)
+    {
+        string f = ObtenerStr(item, "fechaHora");
+        if (DateTime.TryParse(f, out DateTime dt)) return dt;
+        return DateTime.MinValue;
+    }
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-primary mb-0"><i class="far fa-calendar-alt me-2"></i>Cronograma del Proyecto</h2>
+            <p class="text-muted mt-1">Gestiona los Sprints, ensamblajes y reuniones del equipo.</p>
+        </div>
+        <a href="/Meeting/Create" class="btn btn-primary shadow-sm px-4">
+            <i class="fas fa-plus me-1"></i> Agendar Reunión
+        </a>
+    </div>
+
+    <div class="row">
+        @if (Model != null && Model.Count > 0)
+        {
+            var reunionesOrdenadas = Model.OrderBy(m => ObtenerFecha(m)).ToList();
+
+            foreach (var reunion in reunionesOrdenadas)
+            {
+                DateTime fecha = ObtenerFecha(reunion);
+                string estado = ObtenerStr(reunion, "estado");
+                string badgeClass = estado == "Programada" ? "bg-info text-dark" : (estado == "Completada" ? "bg-success" : "bg-danger");
+
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm border-0 h-100 border-start border-4 border-primary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="fw-bold mb-0 text-dark">@ObtenerStr(reunion, "titulo")</h5>
+                                <span class="badge @badgeClass rounded-pill">@estado</span>
+                            </div>
+
+                            <h6 class="text-secondary mb-3"><i class="fas fa-bullseye me-1"></i> Propósito: @ObtenerStr(reunion, "proposito")</h6>
+
+                            <div class="bg-light p-3 rounded mb-3">
+                                <div class="row text-center">
+                                    <div class="col-6 border-end">
+                                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Fecha</small>
+                                        <span class="fw-semibold text-primary">
+                                            @(fecha != DateTime.MinValue ? fecha.ToString("dd MMM yyyy") : "Sin definir")
+                                        </span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Hora</small>
+                                        <span class="fw-semibold text-primary">
+                                            @(fecha != DateTime.MinValue ? fecha.ToString("hh:mm tt") : "--:--")
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="text-muted small mb-3">
+                                <i class="fas fa-map-marker-alt text-danger me-1"></i> Ubicación/Link: <strong>@ObtenerStr(reunion, "ubicacion")</strong>
+                            </p>
+
+                            <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                                <form action="/Meeting/Delete" method="post" onsubmit="return confirm('¿Seguro que deseas eliminar esta reunión?');">
+                                    <input type="hidden" name="id" value="@ObtenerId(reunion)" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm"><i class="fas fa-times me-1"></i> Cancelar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="alert alert-light text-center border p-5 shadow-sm">
+                    <i class="far fa-calendar-times fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted fw-bold">El cronograma está vacío</h5>
+                    <p class="text-muted mb-0">No hay reuniones programadas para este proyecto aún.</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>

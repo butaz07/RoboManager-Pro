@@ -1,0 +1,154 @@
+﻿@model List<dynamic>
+
+@{
+    ViewData["Title"] = "Gestión de Tareas";
+
+    // 🔥 Funciones Antibombas para extraer datos seguros 🔥
+    string ObtenerValorSeguro(dynamic item, string opcion1, string opcion2)
+    {
+        if (item is System.Text.Json.JsonElement json)
+        {
+            if (json.TryGetProperty(opcion1, out var val)) return val.ToString();
+            if (json.TryGetProperty(char.ToUpper(opcion1[0]) + opcion1.Substring(1), out val)) return val.ToString();
+            if (json.TryGetProperty(opcion2, out val)) return val.ToString();
+        }
+        return "N/A";
+    }
+
+    int ObtenerIdSeguro(dynamic item)
+    {
+        if (item is System.Text.Json.JsonElement json)
+        {
+            if (json.TryGetProperty("id", out var val)) return val.GetInt32();
+            if (json.TryGetProperty("Id", out val)) return val.GetInt32();
+        }
+        return 0;
+    }
+
+    int ObtenerEstadoSeguro(dynamic item)
+    {
+        if (item is System.Text.Json.JsonElement json)
+        {
+            if (json.TryGetProperty("status", out var val) && val.ValueKind != System.Text.Json.JsonValueKind.Null) return val.GetInt32();
+            if (json.TryGetProperty("Status", out val) && val.ValueKind != System.Text.Json.JsonValueKind.Null) return val.GetInt32();
+        }
+        return 0; // 0 = Pendiente por defecto
+    }
+
+    string FormatearFecha(dynamic item)
+    {
+        if (item is System.Text.Json.JsonElement json)
+        {
+            if (json.TryGetProperty("deadline", out var val) || json.TryGetProperty("Deadline", out val))
+            {
+                if (DateTime.TryParse(val.ToString(), out DateTime fecha))
+                {
+                    return fecha.ToString("dd/MM/yyyy hh:mm tt"); // Formato: 25/04/2026 08:30 PM
+                }
+            }
+        }
+        return "Sin fecha límite";
+    }
+}
+
+<div class="container mt-5">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> <strong>¡Ups!</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-primary mb-0"><i class="fas fa-clipboard-list me-2"></i>Tareas del Proyecto</h2>
+            <p class="text-muted mt-1">Administra las asignaciones y monitorea su progreso.</p>
+        </div>
+        <a href="/ProjectTask/Create" class="btn btn-primary shadow-sm">
+            <i class="fas fa-plus-circle me-1"></i> Nueva Tarea
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 bg-white">
+                    <thead class="bg-light" style="border-bottom: 3px solid #dee2e6;">
+                        <tr class="text-muted text-uppercase" style="font-size: 0.85rem;">
+                            <th class="py-3 px-4">Tarea</th>
+                            <th class="py-3">Fecha Límite</th>
+                            <th class="py-3 text-center">Estado</th>
+                            <th class="py-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Count > 0)
+                        {
+                            @foreach (var task in Model)
+                            {
+                                int estado = ObtenerEstadoSeguro(task);
+
+                                <tr>
+                                    <td class="px-4">
+                                        <div class="fw-bold text-dark">@ObtenerValorSeguro(task, "title", "Title")</div>
+                                        <div class="text-muted small text-truncate" style="max-width: 250px;">
+                                            @ObtenerValorSeguro(task, "description", "Description")
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="text-secondary"><i class="far fa-calendar-alt me-1"></i> @FormatearFecha(task)</span>
+                                    </td>
+
+                                    <td class="text-center">
+                                        @if (estado == 0)
+                                        {
+                                            <span class="badge bg-secondary px-3 py-2 rounded-pill">Pendiente</span>
+                                        }
+                                        else if (estado == 1)
+                                        {
+                                            <span class="badge bg-info text-dark px-3 py-2 rounded-pill">En Progreso</span>
+                                        }
+                                        else if (estado == 2)
+                                        {
+                                            <span class="badge bg-success px-3 py-2 rounded-pill">Completada</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-dark px-3 py-2 rounded-pill">Desconocido</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a href="/ProjectTask/Edit/@ObtenerIdSeguro(task)" class="btn btn-warning btn-sm text-white" title="Editar Tarea">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="/ProjectTask/Delete" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta tarea?');">
+                                                <input type="hidden" name="id" value='@ObtenerIdSeguro(task)' />
+                                                <button type="submit" class="btn btn-danger btn-sm" title="Eliminar Tarea">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <i class="fas fa-clipboard text-light fa-4x mb-3"></i>
+                                    <h5 class="text-muted fw-bold">No hay tareas registradas</h5>
+                                    <p class="text-muted mb-0">Comienza asignando responsabilidades a tu equipo.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

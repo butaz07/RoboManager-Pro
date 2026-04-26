@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Agendar Reunión";
+}
+
+<div class="container mt-5">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger shadow-sm"><i class="fas fa-exclamation-circle"></i> @TempData["Error"]</div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Agendar Nueva Reunión</h5>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <form action="/Meeting/Create" method="post">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Título de la Reunión</label>
+                                    <input type="text" name="titulo" class="form-control" placeholder="Ej. Planificación de Sprint 1" required />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Propósito</label>
+                                    <select name="proposito" class="form-select" required>
+                                        <option value="">-- Selecciona el motivo --</option>
+                                        <option value="Sprint Review / Planning">Sprint Review / Planning</option>
+                                        <option value="Ensamblaje de Hardware">Ensamblaje de Hardware</option>
+                                        <option value="Revisión de Código / Base de Datos">Revisión de Código / Base de Datos</option>
+                                        <option value="Lluvia de Ideas">Lluvia de Ideas</option>
+                                        <option value="Pruebas de Prototipo">Pruebas de Prototipo</option>
+                                        <option value="General">General / Otro</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Fecha y Hora</label>
+                                    <input type="datetime-local" name="fechaHora" class="form-control" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Ubicación o Enlace</label>
+                                    <input type="text" name="ubicacion" class="form-control" placeholder="Ej. Aula 302, Laboratorio o Link de Zoom..." required />
+                                </div>
+
+                                <div class="mb-4 mt-4 p-3 border rounded bg-light">
+                                    <label class="form-label fw-bold text-primary"><i class="fas fa-project-diagram me-1"></i> Vincular a Proyecto</label>
+                                    <select name="projectId" class="form-select" required>
+                                        <option value="">-- Selecciona el Proyecto --</option>
+                                        @if (ViewBag.Proyectos != null)
+                                        {
+                                            foreach (var proyecto in ViewBag.Proyectos)
+                                            {
+                                                if (proyecto is System.Text.Json.JsonElement pJson)
+                                                {
+                                                    int idProj = 0;
+                                                    if (pJson.TryGetProperty("id", out var idProp)) idProj = idProp.GetInt32();
+                                                    else if (pJson.TryGetProperty("Id", out idProp)) idProj = idProp.GetInt32();
+
+                                                    string nombreProj = "Desconocido";
+                                                    if (pJson.TryGetProperty("nombre", out var nomProp)) nombreProj = nomProp.GetString();
+                                                    else if (pJson.TryGetProperty("Nombre", out nomProp)) nombreProj = nomProp.GetString();
+
+                                                    <option value="@idProj">@nombreProj</option>
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                    <small class="text-muted mt-1 d-block">¿A qué proyecto de robótica corresponde esta reunión?</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="text-muted" />
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <a href="/Meeting" class="btn btn-light border"><i class="fas fa-times me-1"></i> Cancelar</a>
+                            <button type="submit" class="btn btn-primary px-5 fw-bold"><i class="fas fa-calendar-check me-1"></i> Agendar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Color azul exacto al de tu imagen de referencia */
         .bg-itla-blue {
             background-color: #195cb0 !important;
         }
@@ -35,6 +34,11 @@
             <div class="collapse navbar-collapse justify-content-end" id="menuNavegacion">
                 <ul class="navbar-nav">
                     <li class="nav-item">
+                        <a class="nav-link text-white fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-home me-1"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link text-white" href="/Member"><i class="fas fa-user-graduate me-1"></i> Miembros</a>
                     </li>
                     <li class="nav-item">
@@ -44,7 +48,19 @@
                         <a class="nav-link text-white" href="/Project"><i class="fas fa-project-diagram me-1"></i> Proyectos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white" href="/Component"><i class="fas fa-microchip me-1"></i> Inventario</a>
+                        <a class="nav-link text-white" asp-controller="ProjectTask" asp-action="Index">
+                            <i class="fas fa-tasks me-1"></i> Tareas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="Component" asp-action="Index">
+                            <i class="fas fa-microchip me-1"></i> Inventario
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="Meeting" asp-action="Index">
+                            <i class="far fa-calendar-alt me-1"></i> Reuniones
+                        </a>
                     </li>
                 </ul>
             </div>

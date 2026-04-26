@@ -1,32 +1,102 @@
 using Microsoft.AspNetCore.Mvc;
-using RoboManager.Web.Models;
-using System.Diagnostics;
+using System.Text.Json;
 
 namespace RoboManager.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly HttpClient _httpClient;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController()
         {
-            _logger = logger;
+            _httpClient = new HttpClient();
+            _httpClient.BaseAddress = new Uri("https://localhost:7169/"); 
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            
+            int totalProyectos = 0;
+            int tareasPendientes = 0;
+            int totalComponentes = 0;
+            int proximasReuniones = 0;
+
+            try
+            {
+                
+                var resProj = await _httpClient.GetAsync("api/Project");
+                if (resProj.IsSuccessStatusCode)
+                {
+                    var proyectos = JsonSerializer.Deserialize<List<dynamic>>(await resProj.Content.ReadAsStringAsync());
+                    if (proyectos != null) totalProyectos = proyectos.Count;
+                }
+
+               
+                var resTask = await _httpClient.GetAsync("api/ProjectTask"); 
+                if (resTask.IsSuccessStatusCode)
+                {
+                    var tareas = JsonSerializer.Deserialize<List<dynamic>>(await resTask.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (tareas != null)
+                    {
+                       
+                        tareasPendientes = tareas.Count(t =>
+                        {
+                            if (t is JsonElement json && (json.TryGetProperty("status", out var val) || json.TryGetProperty("Status", out val)))
+                            {
+                                return val.GetInt32() < 2;
+                            }
+                            return false;
+                        });
+                    }
+                }
+
+                
+                var resComp = await _httpClient.GetAsync("api/Component");
+                if (resComp.IsSuccessStatusCode)
+                {
+                    var componentes = JsonSerializer.Deserialize<List<dynamic>>(await resComp.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (componentes != null)
+                    {
+                        foreach (var comp in componentes)
+                        {
+                            if (comp is JsonElement json && (json.TryGetProperty("cantidad", out var val) || json.TryGetProperty("Cantidad", out val)))
+                            {
+                                totalComponentes += val.GetInt32();
+                            }
+                        }
+                    }
+                }
+
+               
+                var resMeet = await _httpClient.GetAsync("api/Meeting");
+                if (resMeet.IsSuccessStatusCode)
+                {
+                    var reuniones = JsonSerializer.Deserialize<List<dynamic>>(await resMeet.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (reuniones != null)
+                    {
+                        proximasReuniones = reuniones.Count(r =>
+                        {
+                            if (r is JsonElement json && (json.TryGetProperty("estado", out var val) || json.TryGetProperty("Estado", out val)))
+                            {
+                                return val.GetString() == "Programada";
+                            }
+                            return false;
+                        });
+                    }
+                }
+            }
+            catch
+            {
+               
+            }
+
+            
+            ViewBag.TotalProyectos = totalProyectos;
+            ViewBag.TareasPendientes = tareasPendientes;
+            ViewBag.TotalComponentes = totalComponentes;
+            ViewBag.ProximasReuniones = proximasReuniones;
+
             return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

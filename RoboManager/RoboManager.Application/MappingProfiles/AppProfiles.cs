@@ -43,18 +43,11 @@ namespace RoboManager.Application.MappingProfiles
                 .ForMember(d => d.StartDate, o => o.MapFrom(s => s.FechaInicio))
                 .ForMember(d => d.EndDate, o => o.MapFrom(s => s.FechaFin));
 
-            
-            CreateMap<ProjectTask, ProjectTaskDto>()
-                .ForMember(d => d.Titulo, o => o.MapFrom(s => s.Title))
-                .ForMember(d => d.Descripcion, o => o.MapFrom(s => s.Description))
-                .ForMember(d => d.Estado, o => o.MapFrom(s => s.Status));
-
-            CreateMap<ProjectTaskCreateDto, ProjectTask>()
-                .ForMember(d => d.Title, o => o.MapFrom(s => s.Titulo))
-                .ForMember(d => d.Description, o => o.MapFrom(s => s.Descripcion))
-                .ForMember(d => d.Status, o => o.MapFrom(s => s.Estado));
-
            
+            CreateMap<ProjectTask, ProjectTaskDto>().ReverseMap();
+            CreateMap<ProjectTaskCreateDto, ProjectTask>();
+
+
             CreateMap<Component, ComponentDto>()
                 .ForMember(d => d.Nombre, o => o.MapFrom(s => s.Name))
                 .ForMember(d => d.Tipo, o => o.MapFrom(s => s.Type))
@@ -66,6 +59,9 @@ namespace RoboManager.Application.MappingProfiles
                 .ForMember(d => d.Type, o => o.MapFrom(s => s.Tipo))
                 .ForMember(d => d.Quantity, o => o.MapFrom(s => s.Cantidad))
                 .ForMember(d => d.Status, o => o.MapFrom(s => s.Estado));
+
+            CreateMap<Meeting, MeetingDto>().ReverseMap();
+            CreateMap<MeetingCreateDto, Meeting>();
         }
     }
 }

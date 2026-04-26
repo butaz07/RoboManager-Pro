@@ -1,0 +1,114 @@
+﻿@{
+    ViewData["Title"] = "Crear Tarea";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Asignar Nueva Tarea</h5>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <form action="/ProjectTask/Create" method="post">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Título de la Tarea</label>
+                                    <input type="text" name="title" class="form-control" placeholder="Ej. Diseñar Base de Datos" required />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Descripción</label>
+                                    <textarea name="description" class="form-control" rows="3" placeholder="Detalles de lo que hay que hacer..." required></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Fecha Límite</label>
+                                    <input type="datetime-local" name="deadline" class="form-control" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Estado Inicial</label>
+                                    <select name="status" class="form-select">
+                                        <option value="0">Pendiente</option>
+                                        <option value="1">En Progreso</option>
+                                        <option value="2">Completada</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-primary">Vincular a Proyecto</label>
+                                    <select name="projectId" class="form-select" required>
+                                        <option value="">-- Selecciona un Proyecto --</option>
+                                        @if (ViewBag.Proyectos != null)
+                                        {
+                                            foreach (var proyecto in ViewBag.Proyectos)
+                                            {
+                                                if (proyecto is System.Text.Json.JsonElement pJson)
+                                                {
+                                                    int idProj = 0;
+                                                    if (pJson.TryGetProperty("id", out var idProp)) idProj = idProp.GetInt32();
+                                                    else if (pJson.TryGetProperty("Id", out idProp)) idProj = idProp.GetInt32();
+
+                                                    string nombreProj = "Desconocido";
+                                                    if (pJson.TryGetProperty("nombre", out var nomProp)) nombreProj = nomProp.GetString();
+                                                    else if (pJson.TryGetProperty("Nombre", out nomProp)) nombreProj = nomProp.GetString();
+
+                                                    <option value="@idProj">@nombreProj</option>
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-success">Asignar a Integrante (Opcional)</label>
+                                    <select name="assignedMemberId" class="form-select">
+                                        <option value="">-- Dejar sin asignar por ahora --</option>
+                                        @if (ViewBag.Miembros != null)
+                                        {
+                                            foreach (var miembro in ViewBag.Miembros)
+                                            {
+                                                if (miembro is System.Text.Json.JsonElement mJson)
+                                                {
+                                                    int idMem = 0;
+                                                    if (mJson.TryGetProperty("id", out var idProp)) idMem = idProp.GetInt32();
+                                                    else if (mJson.TryGetProperty("Id", out idProp)) idMem = idProp.GetInt32();
+
+                                                    // Concatenamos Nombre y Apellido para que se vea más profesional
+                                                    string nombreCompleto = "Desconocido";
+                                                    string nom = "", ape = "";
+
+                                                    if (mJson.TryGetProperty("nombre", out var nProp)) nom = nProp.GetString();
+                                                    else if (mJson.TryGetProperty("Nombre", out nProp)) nom = nProp.GetString();
+
+                                                    if (mJson.TryGetProperty("apellido", out var aProp)) ape = aProp.GetString();
+                                                    else if (mJson.TryGetProperty("Apellido", out aProp)) ape = aProp.GetString();
+
+                                                    nombreCompleto = $"{nom} {ape}".Trim();
+
+                                                    <option value="@idMem">@nombreCompleto</option>
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="text-muted" />
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <a href="/ProjectTask" class="btn btn-light border"><i class="fas fa-times me-1"></i> Cancelar</a>
+                            <button type="submit" class="btn btn-primary px-5 fw-bold"><i class="fas fa-save me-1"></i> Guardar Tarea</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,128 @@
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Editar Tarea";
+
+    // Funciones seguras para leer el JSON
+    string ObtenerStr(dynamic item, string campo)
+    {
+        if (item is System.Text.Json.JsonElement j)
+        {
+            if (j.TryGetProperty(campo, out var v)) return v.ToString();
+            if (j.TryGetProperty(char.ToUpper(campo[0]) + campo.Substring(1), out v)) return v.ToString();
+        }
+        return "";
+    }
+
+    int ObtenerInt(dynamic item, string campo)
+    {
+        if (item is System.Text.Json.JsonElement j)
+        {
+            if (j.TryGetProperty(campo, out var v) && v.ValueKind != System.Text.Json.JsonValueKind.Null) return v.GetInt32();
+            if (j.TryGetProperty(char.ToUpper(campo[0]) + campo.Substring(1), out v) && v.ValueKind != System.Text.Json.JsonValueKind.Null) return v.GetInt32();
+        }
+        return 0;
+    }
+
+    string ObtenerFechaFormateada()
+    {
+        string fechaCruda = ObtenerStr(Model, "deadline");
+        if (DateTime.TryParse(fechaCruda, out DateTime dt))
+        {
+            return dt.ToString("yyyy-MM-ddTHH:mm"); // Formato exacto que necesita el input datetime-local
+        }
+        return "";
+    }
+
+    int id = ObtenerInt(Model, "id");
+    int statusActual = ObtenerInt(Model, "status");
+    int projectActual = ObtenerInt(Model, "projectId");
+    int memberActual = ObtenerInt(Model, "assignedMemberId");
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark py-3">
+                    <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Editar Tarea</h5>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <form action="/ProjectTask/Edit" method="post">
+                        <input type="hidden" name="id" value="@id" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Título</label>
+                                    <input type="text" name="title" class="form-control" value="@ObtenerStr(Model, "title")" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Descripción</label>
+                                    <textarea name="description" class="form-control" rows="3" required>@ObtenerStr(Model, "description")</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Fecha Límite</label>
+                                    <input type="datetime-local" name="deadline" class="form-control" value="@ObtenerFechaFormateada()" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Estado</label>
+                                    <select name="status" class="form-select">
+                                        <option value="0" selected="@(statusActual == 0 ? "selected" : null)">Pendiente</option>
+                                        <option value="1" selected="@(statusActual == 1 ? "selected" : null)">En Progreso</option>
+                                        <option value="2" selected="@(statusActual == 2 ? "selected" : null)">Completada</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-primary">Proyecto</label>
+                                    <select name="projectId" class="form-select" required>
+                                        <option value="">-- Selecciona Proyecto --</option>
+                                        @if (ViewBag.Proyectos != null)
+                                        {
+                                            foreach (var p in ViewBag.Proyectos)
+                                            {
+                                                int pId = ObtenerInt(p, "id");
+                                                <option value="@pId" selected="@(projectActual == pId ? "selected" : null)">
+                                                    @ObtenerStr(p, "nombre")
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-success">Integrante Asignado</label>
+                                    <select name="assignedMemberId" class="form-select">
+                                        <option value="">-- Sin asignar --</option>
+                                        @if (ViewBag.Miembros != null)
+                                        {
+                                            foreach (var m in ViewBag.Miembros)
+                                            {
+                                                int mId = ObtenerInt(m, "id");
+                                                string nombreCompleto = $"{ObtenerStr(m, "nombre")} {ObtenerStr(m, "apellido")}";
+                                                <option value="@mId" selected="@(memberActual == mId ? "selected" : null)">
+                                                    @nombreCompleto.Trim()
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="text-muted" />
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <a href="/ProjectTask" class="btn btn-light border"><i class="fas fa-times me-1"></i> Cancelar</a>
+                            <button type="submit" class="btn btn-warning px-5 fw-bold"><i class="fas fa-save me-1"></i> Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

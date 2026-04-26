@@ -1,6 +1,4 @@
-﻿using RoboManager.Domain.Common;
-using RoboManager.Domain.Enums;
-using System;
+﻿using System;
 
 namespace RoboManager.Application.DTOs
 {
@@ -8,20 +6,20 @@ namespace RoboManager.Application.DTOs
     {
         public int Id { get; set; }
         public string Titulo { get; set; } = string.Empty;
+        public string Proposito { get; set; } = string.Empty;
         public DateTime FechaHora { get; set; }
-        public string LinkVirtual { get; set; } = string.Empty;
-        public string Notas { get; set; } = string.Empty;
-        public MeetingStatus Estado { get; set; }
+        public string Ubicacion { get; set; } = string.Empty;
+        public string Estado { get; set; } = string.Empty;
         public int ProjectId { get; set; }
     }
 
     public class MeetingCreateDto
     {
         public string Titulo { get; set; } = string.Empty;
+        public string Proposito { get; set; } = string.Empty;
         public DateTime FechaHora { get; set; }
-        public string LinkVirtual { get; set; } = string.Empty;
-        public string Notas { get; set; } = string.Empty;
-        public MeetingStatus Estado { get; set; }
+        public string Ubicacion { get; set; } = string.Empty;
+        public string Estado { get; set; } = "Programada";
         public int ProjectId { get; set; }
     }
 }

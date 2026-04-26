@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq; // Necesario para el filtrado
+using System.Linq; 
 using System.Threading.Tasks;
 using AutoMapper;
 using RoboManager.Application.Contracts;
@@ -19,7 +19,7 @@ namespace RoboManager.Application.Services
             _mapper = mapper;
         }
 
-        // 🔥 FILTRO: Solo devolvemos miembros que estén marcados como Activo = true
+        
         public async Task<IEnumerable<MemberDto>> GetAllMembersAsync()
         {
             var entities = await _unitOfWork.MemberRepository.GetAllAsync();
@@ -27,7 +27,6 @@ namespace RoboManager.Application.Services
             return _mapper.Map<IEnumerable<MemberDto>>(activos);
         }
 
-        // 🔥 SEGURIDAD: Validamos que no se puedan obtener datos de un miembro "borrado"
         public async Task<MemberDto?> GetMemberByIdAsync(int id)
         {
             var entity = await _unitOfWork.MemberRepository.GetByIdAsync(id);
@@ -39,7 +38,7 @@ namespace RoboManager.Application.Services
         public async Task<MemberDto> CreateMemberAsync(MemberCreateDto dto)
         {
             var entity = _mapper.Map<Member>(dto);
-            entity.Activo = true; // Forzamos que el nuevo miembro entre con estado activo
+            entity.Activo = true;
             await _unitOfWork.MemberRepository.AddAsync(entity);
             await _unitOfWork.CompleteAsync();
             return _mapper.Map<MemberDto>(entity);
@@ -48,7 +47,7 @@ namespace RoboManager.Application.Services
         public async Task<bool> UpdateMemberAsync(int id, MemberCreateDto dto)
         {
             var entity = await _unitOfWork.MemberRepository.GetByIdAsync(id);
-            // 🔥 SEGURIDAD: Impedimos la edición si el miembro ha sido dado de baja
+            
             if (entity == null || !entity.Activo) return false;
 
             _mapper.Map(dto, entity);
@@ -62,7 +61,7 @@ namespace RoboManager.Application.Services
             var entity = await _unitOfWork.MemberRepository.GetByIdAsync(id);
             if (entity == null) return false;
 
-            // BORRADO LÓGICO: Apagamos el switch de Activo
+            
             entity.Activo = false;
             await _unitOfWork.MemberRepository.UpdateAsync(entity);
             await _unitOfWork.CompleteAsync();
